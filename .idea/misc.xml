@@ -6,10 +6,11 @@
         <entry key="..\:/contacts_app/app/src/main/res/drawable/ic_email.xml" value="0.202" />
         <entry key="..\:/contacts_app/app/src/main/res/drawable/ic_local_phone.xml" value="0.202" />
         <entry key="..\:/contacts_app/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/contacts_app/app/src/main/res/layout/activity_manage_contact.xml" value="0.264" />
         <entry key="..\:/contacts_app/app/src/main/res/layout/contact_card.xml" value="0.264" />
         <entry key="..\:/contacts_app/app/src/main/res/layout/contact_list_item.xml" value="0.2" />
         <entry key="..\:/contacts_app/app/src/main/res/layout/contacts_list_view.xml" value="0.24895833333333334" />
-        <entry key="..\:/contacts_app/app/src/main/res/layout/fragment_contacts.xml" value="0.13125" />
+        <entry key="..\:/contacts_app/app/src/main/res/layout/fragment_contacts.xml" value="0.10400000000000001" />
       </map>
     </option>
   </component>

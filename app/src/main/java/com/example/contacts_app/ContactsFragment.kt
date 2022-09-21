@@ -1,6 +1,7 @@
 package com.example.contacts_app
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -10,17 +11,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 @SuppressLint("InlinedApi", "ObsoleteSdkInt")
 private val FROM_COLUMNS: Array<String> = arrayOf(
     if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)) {
         ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
     } else {
-        ContactsContract.Contacts.DISPLAY_NAME
+            ContactsContract.Contacts.DISPLAY_NAME
     }
 )
 
@@ -36,10 +39,9 @@ private val PROJECTION: Array<out String> = arrayOf(
 private const val CONTACT_ID_INDEX: Int = 0
 private const val CONTACT_KEY_INDEX: Int = 1
 private val searchString: String = ""
-private val selectionArgs = arrayOf<String>(searchString)
+private val selectionArgs = arrayOf(searchString)
 private val TO_IDS: IntArray = intArrayOf(android.R.id.text1)
-
-@SuppressLint("InlinedApi")
+@SuppressLint("InlinedApi", "ObsoleteSdkInt")
 private val SELECTION: String =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
         "${ContactsContract.Contacts.DISPLAY_NAME_PRIMARY} LIKE ?"
@@ -70,7 +72,11 @@ class ContactsFragment : Fragment(),
         savedInstanceState: Bundle?
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_contacts, container, false)
-
+        val floatingActionBtn: FloatingActionButton=view.findViewById(R.id.floating_action)
+        floatingActionBtn.setOnClickListener{
+            val intent=Intent(this.activity,ManageContactActivity::class.java)
+            startActivity(intent)
+        }
         return view
     }
 
@@ -82,13 +88,6 @@ class ContactsFragment : Fragment(),
         activity?.also {
             contactsList = it.findViewById<ListView>(R.id.contact_list_view)
             // Gets a CursorAdapter
-            var cursor: Cursor? = this.activity?.contentResolver?.query(
-                ContactsContract.Contacts.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-            )
             cursorAdapter = SimpleCursorAdapter(
                 it,
                 android.R.layout.simple_list_item_2,
@@ -96,57 +95,31 @@ class ContactsFragment : Fragment(),
                 FROM_COLUMNS, TO_IDS,
                 0
             )
-
-//            val userList: ArrayList<String> = ArrayList()
-//            if (cursor != null) {
-//                while (cursor.moveToNext()){
-//                    val name: String =
-//                        cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
-//                    userList.add(name)
-//                }
-//            }
-//            cursorAdapter = SimpleCursorAdapter(
-//                this.activity,
-//                R.id.contact_list_view,
-//                cursor,
-//                FROM_COLUMNS, TO_IDS,
-//                0
-//            )
-            // Sets the adapter for the ListView
             contactsList.onItemClickListener = this
             contactsList.adapter = cursorAdapter
-
-//            contactsList.adapter = this.activity
-//                ?.let { it1 -> ArrayAdapter<String>(it1, android.R.layout.simple_list_item_1, userList) }
 
         }
     }
 
     override fun onItemClick(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-        // Get the Cursor
         val cursor: Cursor? = (parent.adapter as? CursorAdapter)?.cursor?.apply {
-            // Move to the selected contact
             moveToPosition(position)
-            // Get the _ID value
             contactId = getLong(CONTACT_ID_INDEX)
-            // Get the selected LOOKUP KEY
             contactKey = getString(CONTACT_KEY_INDEX)
-            // Create the contact's content Uri
             contactUri = ContactsContract.Contacts.getLookupUri(contactId, "+967")
-            /*
-             * You can use contactUri as the content URI for retrieving
-             * the details for a contact.
-             */
         }
+        if (cursor != null) {
+           val intent=Intent(this.activity,ManageContactActivity::class.java).apply {
+               putExtra("id",cursor.getString(0))
+           }
+            startActivity(intent)
+
+        }
+
     }
 
     override fun onCreateLoader(loaderId: Int, args: Bundle?): Loader<Cursor> {
-        /*
-         * Makes search string into pattern and
-         * stores it in the selection array
-         */
         selectionArgs[0] = "%$searchString%"
-        // Starts the query
         return activity?.let {
             return CursorLoader(
                 it,
