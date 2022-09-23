@@ -38,7 +38,7 @@ private val PROJECTION: Array<out String> = arrayOf(
 )
 private const val CONTACT_ID_INDEX: Int = 0
 private const val CONTACT_KEY_INDEX: Int = 1
-private val searchString: String = ""
+private val searchString: String = "A1"
 private val selectionArgs = arrayOf(searchString)
 private val TO_IDS: IntArray = intArrayOf(android.R.id.text1)
 @SuppressLint("InlinedApi", "ObsoleteSdkInt")
@@ -53,9 +53,6 @@ class ContactsFragment : Fragment(),
     AdapterView.OnItemClickListener {
 
     private lateinit var contactsList: ListView
-    var contactId: Long = 0
-    var contactKey: String? = null
-    var contactUri: Uri? = null
     private var cursorAdapter: SimpleCursorAdapter? = null
 
 
@@ -86,8 +83,7 @@ class ContactsFragment : Fragment(),
         super.onActivityCreated(savedInstanceState)
         // Gets the ListView from the View list of the parent activity
         activity?.also {
-            contactsList = it.findViewById<ListView>(R.id.contact_list_view)
-            // Gets a CursorAdapter
+            contactsList = it.findViewById(R.id.contact_list_view)
             cursorAdapter = SimpleCursorAdapter(
                 it,
                 android.R.layout.simple_list_item_2,
@@ -102,15 +98,20 @@ class ContactsFragment : Fragment(),
     }
 
     override fun onItemClick(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+
+        var contactId: Long = 0
+        var contactKey: String? = null
+        var contactUri: Uri? = null
+
         val cursor: Cursor? = (parent.adapter as? CursorAdapter)?.cursor?.apply {
             moveToPosition(position)
             contactId = getLong(CONTACT_ID_INDEX)
             contactKey = getString(CONTACT_KEY_INDEX)
-            contactUri = ContactsContract.Contacts.getLookupUri(contactId, "+967")
+            contactUri = ContactsContract.Contacts.getLookupUri(contactId, "+966")
         }
         if (cursor != null) {
-           val intent=Intent(this.activity,ManageContactActivity::class.java).apply {
-               putExtra("id",cursor.getString(0))
+           val intent=Intent(this.activity,ContactDetailsActivity::class.java).apply {
+               putExtra("id",contactId)
            }
             startActivity(intent)
 

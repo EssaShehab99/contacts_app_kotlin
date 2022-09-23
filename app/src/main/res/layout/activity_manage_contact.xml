@@ -8,30 +8,18 @@
 
 
     <EditText
-        android:id="@+id/first_name_edit_text"
+        android:id="@+id/full_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textCapWords"
         android:maxLines="1"
-        android:hint="First Name"
+        android:hint="Full Name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:autofillHints=""
         android:layout_margin="10dp"/>
 
-    <EditText
-        android:id="@+id/last_name_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textCapWords"
-        android:maxLines="1"
-        android:hint="Last Name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/first_name_edit_text"
-        android:autofillHints=""
-        android:layout_margin="10dp" />
 
     <EditText
         android:id="@+id/phone_number_edit_text"
@@ -42,11 +30,12 @@
         android:hint="Number"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/last_name_edit_text"
+        app:layout_constraintTop_toBottomOf="@+id/full_name"
         android:autofillHints="phone"
         android:layout_margin="10dp"/>
 
     <Button
+        android:id="@+id/save_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save"

@@ -36,6 +36,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:src="@android:drawable/ic_input_add"
+            app:tint="@android:color/white"
             android:layout_margin="20dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
