@@ -44,8 +44,8 @@ class ManageContactActivity : AppCompatActivity() {
     }
 
     private fun updatePhone(contactId: Long, number: String, displayName: String) {
-        val contentProviderOperations = ArrayList<ContentProviderOperation>()
-        contentProviderOperations.add(
+        val ops = ArrayList<ContentProviderOperation>()
+        ops.add(
             ContentProviderOperation
                 .newUpdate(ContactsContract.Data.CONTENT_URI)
                 .withSelection(
@@ -61,7 +61,7 @@ class ManageContactActivity : AppCompatActivity() {
                 )
                 .build()
         )
-        contentProviderOperations.add(
+        ops.add(
             ContentProviderOperation
                 .newUpdate(ContactsContract.Data.CONTENT_URI)
                 .withSelection(
@@ -77,44 +77,9 @@ class ManageContactActivity : AppCompatActivity() {
                 )
                 .build()
         )
-//        //selection for name
-//        var where = java.lang.String.format(
-//            "%s = '%s' AND %s = ?",
-//            ContactsContract.Data.MIMETYPE,  //mimetype
-//            ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
-//            ContactsContract.Data.CONTACT_ID
-//        )
-//        val ops = ArrayList<ContentProviderOperation>()
-//        ops.add(
-//            ContentProviderOperation
-//                .newUpdate(ContactsContract.Data.CONTENT_URI)
-//                .withSelection(where, arrayOf(contactId.toString()) )
-//                .withValue(
-//                    ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
-//                    "A22222"
-//                )
-//                .build()
-//        )
-//        //change selection for number
-//        where = String.format(
-//            "%s = '%s' AND %s = ?",
-//            ContactsContract.Data.MIMETYPE,//mimetype
-//            ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
-//            ContactsContract.Data.DATA1)
-//
-//        ops.add(
-//            ContentProviderOperation
-//                .newUpdate(ContactsContract.Data.CONTENT_URI)
-//                .withSelection(where, arrayOf(oldNumber) )
-//                .withValue(
-//                    ContactsContract.Data.DATA1,
-//                    "8888888"
-//                )
-//                .build()
-//        )
         try {
             contentResolver.applyBatch(
-                ContactsContract.AUTHORITY, contentProviderOperations)
+                ContactsContract.AUTHORITY, ops)
             Toast.makeText(this, "Contact Updated Successfully", Toast.LENGTH_LONG).show()
         } catch (e: OperationApplicationException) {
             e.printStackTrace()
@@ -123,19 +88,6 @@ class ManageContactActivity : AppCompatActivity() {
         }
     }
 
-    //    private fun updatePhone(contactId:Long, newNumber:String, displayName:String) {
-//       try {
-//           val contentValues = ContentValues()
-//           contentValues.put(ContactsContract.CommonDataKinds.Phone.NUMBER, newNumber)
-////           contentValues.put(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, displayName)
-//
-//           val where = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?" + " AND " + ContactsContract.Contacts.Data.MIMETYPE + "=?"
-//           val whereArgs = arrayOf((contactId).toString(), ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
-//
-//           contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, whereArgs)
-//       }catch (e:Exception){
-//       var x=e
-//       }
     private fun insertPhone(number: String, displayName: String) {
         val ops = ArrayList<ContentProviderOperation>()
         val rawContactInsertIndex: Int = ops.size
@@ -183,9 +135,10 @@ class ManageContactActivity : AppCompatActivity() {
         )
 
         try {
-            val res = contentResolver.applyBatch(
+            contentResolver.applyBatch(
                 ContactsContract.AUTHORITY, ops
             )
+            Toast.makeText(this, "Contact Added Successfully", Toast.LENGTH_LONG).show()
         } catch (e: RemoteException) {
             // TODO Auto-generated catch block
             e.printStackTrace()
