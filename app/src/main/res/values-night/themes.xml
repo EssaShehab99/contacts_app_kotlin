@@ -16,4 +16,7 @@
     <style name="Widget.Contact.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/teal_700</item>
     </style>
+    <style name="textStyle">
+        <item name="android:textColor">@color/white</item>
+    </style>
 </resources>

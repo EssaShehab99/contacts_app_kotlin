@@ -1,13 +1,13 @@
 package com.example.contacts_app
 
-import android.content.ContentUris
-import android.content.ContentValues
-import android.content.Intent
+import android.content.ContentProviderOperation
+import android.content.OperationApplicationException
 import android.os.Bundle
+import android.os.RemoteException
 import android.provider.ContactsContract
-import android.provider.UserDictionary
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 
@@ -15,6 +15,7 @@ class ManageContactActivity : AppCompatActivity() {
     private lateinit var saveBTN: Button
     private lateinit var fullName: EditText
     private lateinit var phoneNumber: EditText
+    private lateinit var oldNumber: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manage_contact)
@@ -25,6 +26,7 @@ class ManageContactActivity : AppCompatActivity() {
         if (id.toInt() != 0) {
             fullName.setText(intent.getStringExtra("fullName"))
             phoneNumber.setText(intent.getStringExtra("phoneNumber"))
+            oldNumber= intent.getStringExtra("phoneNumber").toString()
         }
         if (id.toInt() != 0)
             saveBTN.text = "Edit"
@@ -32,68 +34,96 @@ class ManageContactActivity : AppCompatActivity() {
             saveBTN.text = "Save"
         saveBTN.setOnClickListener {
             if (id.toInt() != 0) {
-                updatePhone(id,phoneNumber.text.toString(),fullName.text.toString())
-//                val intent = Intent(Intent.ACTION_INSERT_OR_EDIT).apply {
-//
-//                    type = ContactsContract.Contacts.CONTENT_ITEM_TYPE
-//
-//                    putExtra(
-//                        ContactsContract.Intents.Insert.NAME,
-//                        fullName.text.toString()
-//                    )
-//                    putExtra(
-//                        ContactsContract.Intents.Insert.PHONETIC_NAME,
-//                        ContactsContract.CommonDataKinds.Email.TYPE_WORK
-//                    )
-//                    putExtra(ContactsContract.Intents.Insert.PHONE, phoneNumber.text.toString())
-//                    putExtra(
-//                        ContactsContract.Intents.Insert.PHONE_TYPE,
-//                        ContactsContract.CommonDataKinds.Phone.TYPE_WORK
-//                    )
-//
-//                }
-//                startActivity(intent)
+                updatePhone(id, phoneNumber.text.toString(), fullName.text.toString())
             } else {
-                val intent = Intent(ContactsContract.Intents.Insert.ACTION).apply {
+                insertPhone(phoneNumber.text.toString(), fullName.text.toString())
 
-                    type = ContactsContract.RawContacts.CONTENT_TYPE
-
-                    putExtra(
-                        ContactsContract.Intents.Insert.NAME,
-                        fullName.text.toString()
-                    )
-                    putExtra(
-                        ContactsContract.Intents.Insert.PHONETIC_NAME,
-                        ContactsContract.CommonDataKinds.Email.TYPE_WORK
-                    )
-                    putExtra(ContactsContract.Intents.Insert.PHONE, phoneNumber.text.toString())
-                    putExtra(
-                        ContactsContract.Intents.Insert.PHONE_TYPE,
-                        ContactsContract.CommonDataKinds.Phone.TYPE_WORK
-                    )
-
-                }
-                startActivity(intent)
             }
         }
 
     }
 
-    private fun updatePhone(contactId:Long, newNumber:String, displayName:String) {
-       try {
-           val contentValues = ContentValues()
-           contentValues.put(ContactsContract.CommonDataKinds.Phone.NUMBER, newNumber)
-           contentValues.put(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, displayName)
+    private fun updatePhone(contactId: Long, number: String, displayName: String) {
+        val contentProviderOperations = ArrayList<ContentProviderOperation>()
+        contentProviderOperations.add(
+            ContentProviderOperation
+                .newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(
+                    ContactsContract.Data.MIMETYPE + " = ? AND " +
+                            ContactsContract.Data.DATA1 + " = ?", arrayOf(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+                        oldNumber
+                    )
+                )
+                .withValue(
+                    ContactsContract.Data.DATA1,
+                    number
+                )
+                .build()
+        )
+        contentProviderOperations.add(
+            ContentProviderOperation
+                .newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(
+                    ContactsContract.Data.MIMETYPE + " = ? AND " +
+                            ContactsContract.Data.CONTACT_ID + " = ?", arrayOf(
+                        ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
+                        contactId.toString()
+                    )
+                )
+                .withValue(
+                    ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
+                    displayName
+                )
+                .build()
+        )
+//        //selection for name
+//        var where = java.lang.String.format(
+//            "%s = '%s' AND %s = ?",
+//            ContactsContract.Data.MIMETYPE,  //mimetype
+//            ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
+//            ContactsContract.Data.CONTACT_ID
+//        )
+//        val ops = ArrayList<ContentProviderOperation>()
+//        ops.add(
+//            ContentProviderOperation
+//                .newUpdate(ContactsContract.Data.CONTENT_URI)
+//                .withSelection(where, arrayOf(contactId.toString()) )
+//                .withValue(
+//                    ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
+//                    "A22222"
+//                )
+//                .build()
+//        )
+//        //change selection for number
+//        where = String.format(
+//            "%s = '%s' AND %s = ?",
+//            ContactsContract.Data.MIMETYPE,//mimetype
+//            ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+//            ContactsContract.Data.DATA1)
+//
+//        ops.add(
+//            ContentProviderOperation
+//                .newUpdate(ContactsContract.Data.CONTENT_URI)
+//                .withSelection(where, arrayOf(oldNumber) )
+//                .withValue(
+//                    ContactsContract.Data.DATA1,
+//                    "8888888"
+//                )
+//                .build()
+//        )
+        try {
+            contentResolver.applyBatch(
+                ContactsContract.AUTHORITY, contentProviderOperations)
+            Toast.makeText(this, "Contact Updated Successfully", Toast.LENGTH_LONG).show()
+        } catch (e: OperationApplicationException) {
+            e.printStackTrace()
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+        }
+    }
 
-           val where = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?" + " AND " + ContactsContract.Contacts.Data.MIMETYPE + "=?"
-           val whereArgs = arrayOf((contactId).toString(), ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
-
-           contentResolver.update(ContentUris.withAppendedId(UserDictionary.Words.CONTENT_URI, 4), contentValues, where, whereArgs)
-       }catch (e:Exception){
-       var x=e
-       }
-//    }
-//    private fun updatePhone(contactId:Long, newNumber:String, displayName:String) {
+    //    private fun updatePhone(contactId:Long, newNumber:String, displayName:String) {
 //       try {
 //           val contentValues = ContentValues()
 //           contentValues.put(ContactsContract.CommonDataKinds.Phone.NUMBER, newNumber)
@@ -106,5 +136,62 @@ class ManageContactActivity : AppCompatActivity() {
 //       }catch (e:Exception){
 //       var x=e
 //       }
+    private fun insertPhone(number: String, displayName: String) {
+        val ops = ArrayList<ContentProviderOperation>()
+        val rawContactInsertIndex: Int = ops.size
+        ops.add(
+            ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null).build()
+        )
+//Number number/Contact number
+        ops.add(
+            ContentProviderOperation
+                .newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(
+                    ContactsContract.Data.RAW_CONTACT_ID,
+                    rawContactInsertIndex
+                )
+                .withValue(
+                    ContactsContract.Contacts.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE
+                )
+                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, number)
+                .withValue(
+                    ContactsContract.Contacts.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE
+                )
+                .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, "1").build()
+        )
+        //Display name/Contact name
+        ops.add(
+            ContentProviderOperation
+                .newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(
+                    ContactsContract.Contacts.Data.RAW_CONTACT_ID,
+                    rawContactInsertIndex
+                )
+                .withValue(
+                    ContactsContract.Contacts.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE
+                )
+                .withValue(
+                    ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
+                    displayName
+                )
+                .build()
+        )
+
+        try {
+            val res = contentResolver.applyBatch(
+                ContactsContract.AUTHORITY, ops
+            )
+        } catch (e: RemoteException) {
+            // TODO Auto-generated catch block
+            e.printStackTrace()
+        } catch (e: OperationApplicationException) {
+            // TODO Auto-generated catch block
+            e.printStackTrace()
+        }
     }
 }

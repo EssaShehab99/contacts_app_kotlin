@@ -9,15 +9,15 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <!--        <EditText-->
-        <!--            android:id="@+id/search_value"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="60dp"-->
-        <!--            android:drawableStart="@android:drawable/ic_menu_search"-->
-        <!--            app:layout_constraintEnd_toEndOf="parent"-->
-        <!--            app:layout_constraintStart_toStartOf="parent"-->
-        <!--            app:layout_constraintTop_toTopOf="parent"-->
-        <!--            android:inputType="text"/>-->
+                <EditText
+                    android:id="@+id/search_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:drawableStart="@android:drawable/ic_menu_search"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:inputType="text"/>
         <ListView
             android:id="@+id/contact_list_view"
             android:layout_width="match_parent"
@@ -25,8 +25,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-        <!--app:layout_constraintTop_toBottomOf="@+id/search_value" -->/>
+        app:layout_constraintTop_toBottomOf="@+id/search_value" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floating_action"

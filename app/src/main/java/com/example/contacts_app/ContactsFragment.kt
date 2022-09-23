@@ -38,7 +38,7 @@ private val PROJECTION: Array<out String> = arrayOf(
 )
 private const val CONTACT_ID_INDEX: Int = 0
 private const val CONTACT_KEY_INDEX: Int = 1
-private val searchString: String = "A1"
+private val searchString: String = ""
 private val selectionArgs = arrayOf(searchString)
 private val TO_IDS: IntArray = intArrayOf(android.R.id.text1)
 @SuppressLint("InlinedApi", "ObsoleteSdkInt")
