@@ -47,7 +47,6 @@ class ContactsFragment : Fragment(),
         }
         return view
     }
-
     @SuppressLint("Recycle", "Range")
     @Deprecated("Deprecated in Java")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
