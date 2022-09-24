@@ -19,14 +19,14 @@ class ManageContactActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manage_contact)
-        var id = intent.getLongExtra("id", 0)
+        val id = intent.getLongExtra("id", 0)
         saveBTN = findViewById(R.id.save_btn)
         fullName = findViewById(R.id.full_name)
         phoneNumber = findViewById(R.id.phone_number_edit_text)
         if (id.toInt() != 0) {
             fullName.setText(intent.getStringExtra("fullName"))
             phoneNumber.setText(intent.getStringExtra("phoneNumber"))
-            oldNumber= intent.getStringExtra("phoneNumber").toString()
+            oldNumber = intent.getStringExtra("phoneNumber").toString()
         }
         if (id.toInt() != 0)
             saveBTN.text = "Edit"
@@ -79,7 +79,8 @@ class ManageContactActivity : AppCompatActivity() {
         )
         try {
             contentResolver.applyBatch(
-                ContactsContract.AUTHORITY, ops)
+                ContactsContract.AUTHORITY, ops
+            )
             Toast.makeText(this, "Contact Updated Successfully", Toast.LENGTH_LONG).show()
         } catch (e: OperationApplicationException) {
             e.printStackTrace()

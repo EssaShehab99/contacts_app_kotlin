@@ -34,29 +34,7 @@ class ContactDetailsActivity : AppCompatActivity() {
 
         }
         deleteBTN.setOnClickListener {
-            val ops = ArrayList<ContentProviderOperation>()
-            ops.add(
-                ContentProviderOperation
-                    .newDelete(ContactsContract.RawContacts.CONTENT_URI)
-                    .withSelection(
-                        ContactsContract.RawContacts.CONTACT_ID
-                                + " = ?",
-                        arrayOf(id.toString())
-                    )
-                    .build()
-            );
-
-            try {
-                contentResolver.applyBatch(
-                    ContactsContract.AUTHORITY, ops
-                )
-                Toast.makeText(this, "Contact Delete Successfully", Toast.LENGTH_LONG).show()
-                finish()
-            } catch (e: OperationApplicationException) {
-                e.printStackTrace()
-            } catch (e: RemoteException) {
-                e.printStackTrace()
-            }
+            deletePhone()
         }
     }
 
@@ -89,5 +67,32 @@ class ContactDetailsActivity : AppCompatActivity() {
 
             }
         }
+    }
+
+    private fun  deletePhone(){
+        val ops = ArrayList<ContentProviderOperation>()
+        ops.add(
+            ContentProviderOperation
+                .newDelete(ContactsContract.RawContacts.CONTENT_URI)
+                .withSelection(
+                    ContactsContract.RawContacts.CONTACT_ID
+                            + " = ?",
+                    arrayOf(id.toString())
+                )
+                .build()
+        );
+
+        try {
+            contentResolver.applyBatch(
+                ContactsContract.AUTHORITY, ops
+            )
+            Toast.makeText(this, "Contact Delete Successfully", Toast.LENGTH_LONG).show()
+            finish()
+        } catch (e: OperationApplicationException) {
+            e.printStackTrace()
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+        }
+
     }
 }
