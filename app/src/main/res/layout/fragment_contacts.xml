@@ -16,22 +16,23 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginHorizontal="10dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
             <EditText
                 android:id="@+id/search_value"
                 android:layout_width="fill_parent"
                 android:layout_height="60dp"
+                android:layout_marginHorizontal="10dp"
                 android:layout_weight="1"
                 android:drawableStart="@android:drawable/ic_menu_search"
-                android:inputType="text"
-                android:layout_marginHorizontal="10dp"/>
+                android:inputType="text"/>
             <ImageView
-                android:id="@+id/button"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:padding="15dp"
-                android:src="@drawable/ic_baseline_filter_list_24"/>
+                android:id="@+id/filter_ntn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_baseline_filter_list_24"
+                android:layout_gravity="center"/>
         </LinearLayout>
         <ListView
             android:id="@+id/contact_list_view"
