@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS), 1)
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_CONTACTS), 1)
 
         val fram = supportFragmentManager.beginTransaction()
         fram.replace(R.id.contacts_fragment, ContactsFragment())

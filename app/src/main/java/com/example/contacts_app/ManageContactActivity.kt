@@ -5,62 +5,127 @@ import android.content.OperationApplicationException
 import android.os.Bundle
 import android.os.RemoteException
 import android.provider.ContactsContract
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 
 
 class ManageContactActivity : AppCompatActivity() {
     private lateinit var saveBTN: Button
-    private lateinit var fullName: EditText
-    private lateinit var phoneNumber: EditText
-    private lateinit var oldNumber: String
+    private lateinit var firstName: EditText
+    private lateinit var secondName: EditText
+    private lateinit var firstNumber: EditText
+    private lateinit var secondNumber: EditText
+    private lateinit var thirdNumber: EditText
+    private var oldNumbers: MutableList<String> = mutableListOf()
+    private lateinit var linearLayout_1: LinearLayout
+    private lateinit var linearLayout_2: LinearLayout
+    private lateinit var linearLayout_3: LinearLayout
+    private lateinit var constraintLayout_1: ConstraintLayout
+    private lateinit var constraintLayout_2: ConstraintLayout
+    private lateinit var constraintLayout_3: ConstraintLayout
+    private val numbers: MutableList<String> = mutableListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manage_contact)
         val id = intent.getLongExtra("id", 0)
         saveBTN = findViewById(R.id.save_btn)
-        fullName = findViewById(R.id.full_name)
-        phoneNumber = findViewById(R.id.phone_number_edit_text)
+        firstName = findViewById(R.id.first_name)
+        secondName = findViewById(R.id.second_name)
+        firstNumber = findViewById(R.id.first_phone_number_edit_text)
+        secondNumber = findViewById(R.id.second_phone_number_edit_text)
+        thirdNumber = findViewById(R.id.third_phone_number_edit_text)
+        linearLayout_1 = findViewById(R.id.linear_1)
+        linearLayout_2 = findViewById(R.id.linear_2)
+        linearLayout_3 = findViewById(R.id.linear_3)
+        constraintLayout_1 = findViewById(R.id.first_constraint_layout)
+        constraintLayout_2 = findViewById(R.id.second_constraint_layout)
+        constraintLayout_3 = findViewById(R.id.third_constraint_layout)
+        constraintLayout_1.setOnClickListener {
+            linearLayout_2.visibility = View.VISIBLE
+            constraintLayout_1.visibility = View.GONE
+        }
+        constraintLayout_2.setOnClickListener {
+            linearLayout_3.visibility = View.VISIBLE
+            constraintLayout_2.visibility = View.GONE
+            constraintLayout_3.visibility = View.GONE
+        }
         if (id.toInt() != 0) {
-            fullName.setText(intent.getStringExtra("fullName"))
-            phoneNumber.setText(intent.getStringExtra("phoneNumber"))
-            oldNumber = intent.getStringExtra("phoneNumber").toString()
+            constraintLayout_1.visibility=View.GONE
+            constraintLayout_2.visibility=View.GONE
+            constraintLayout_3.visibility=View.GONE
+            splitFullName(intent.getStringExtra("fullName")?.split(" ") ?: listOf())
+            oldNumbers.addAll(intent.getStringArrayExtra("numbers")!!)
+            showNumbers(oldNumbers)
         }
         if (id.toInt() != 0)
             saveBTN.text = "Edit"
         else
             saveBTN.text = "Save"
         saveBTN.setOnClickListener {
-            if (id.toInt() != 0) {
-                updatePhone(id, phoneNumber.text.toString(), fullName.text.toString())
-            } else {
-                insertPhone(phoneNumber.text.toString(), fullName.text.toString())
-
+            if (firstNumber.text.toString().trim().isNotEmpty() ||
+                firstNumber.text.toString().trim().isNotBlank()
+            ) {
+                numbers.add(firstNumber.text.toString())
             }
-        }
+            if (secondNumber.text.toString().trim().isNotEmpty() ||
+                secondNumber.text.toString().trim().isNotBlank()
+            ) {
+                numbers.add(secondNumber.text.toString())
+            }
+            if (thirdNumber.text.toString().trim().isNotEmpty() ||
+                thirdNumber.text.toString().trim().isNotBlank()
+            ) {
+                numbers.add(thirdNumber.text.toString())
+            }
+           try {
+               if (numbers.isNotEmpty()) {
+                   if (id.toInt() != 0) {
+                       updatePhone(
+                           id,
+                           numbers,
+                           firstName.text.toString() + " " + secondName.text.toString()
+                       )
+                   } else {
+                       insertPhone(
+                           numbers,
+                           firstName.text.toString() + " " + secondName.text.toString()
+                       )
 
+                   }
+               } else {
+                   Toast.makeText(this, "Please insert phone number", Toast.LENGTH_SHORT).show()
+               }
+           }catch (e :java.lang.Exception){
+               Toast.makeText(this, "Please insert phone number", Toast.LENGTH_SHORT).show()
+           }
+        }
     }
 
-    private fun updatePhone(contactId: Long, number: String, displayName: String) {
+    private fun updatePhone(contactId: Long, numbers: MutableList<String>, displayName: String) {
         val ops = ArrayList<ContentProviderOperation>()
-        ops.add(
-            ContentProviderOperation
-                .newUpdate(ContactsContract.Data.CONTENT_URI)
-                .withSelection(
-                    ContactsContract.Data.MIMETYPE + " = ? AND " +
-                            ContactsContract.Data.DATA1 + " = ?", arrayOf(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
-                        oldNumber
+        numbers.forEach {
+            ops.add(
+                ContentProviderOperation
+                    .newUpdate(ContactsContract.Data.CONTENT_URI)
+                    .withSelection(
+                        ContactsContract.Data.MIMETYPE + " = ? AND " +
+                                ContactsContract.Data.DATA1 + " = ?", arrayOf(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+                            oldNumbers[numbers.indexOf(it)]
+                        )
                     )
-                )
-                .withValue(
-                    ContactsContract.Data.DATA1,
-                    number
-                )
-                .build()
-        )
+                    .withValue(
+                        ContactsContract.Data.DATA1,
+                        it
+                    )
+                    .build()
+            )
+        }
         ops.add(
             ContentProviderOperation
                 .newUpdate(ContactsContract.Data.CONTENT_URI)
@@ -89,7 +154,7 @@ class ManageContactActivity : AppCompatActivity() {
         }
     }
 
-    private fun insertPhone(number: String, displayName: String) {
+    private fun insertPhone(numbers: MutableList<String>, displayName: String) {
         val ops = ArrayList<ContentProviderOperation>()
         val rawContactInsertIndex: Int = ops.size
         ops.add(
@@ -98,24 +163,27 @@ class ManageContactActivity : AppCompatActivity() {
                 .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null).build()
         )
 //Number number/Contact number
-        ops.add(
-            ContentProviderOperation
-                .newInsert(ContactsContract.Data.CONTENT_URI)
-                .withValueBackReference(
-                    ContactsContract.Data.RAW_CONTACT_ID,
-                    rawContactInsertIndex
-                )
-                .withValue(
-                    ContactsContract.Contacts.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE
-                )
-                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, number)
-                .withValue(
-                    ContactsContract.Contacts.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE
-                )
-                .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, "1").build()
-        )
+        numbers.forEach {
+            ops.add(
+                ContentProviderOperation
+                    .newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(
+                        ContactsContract.Data.RAW_CONTACT_ID,
+                        rawContactInsertIndex
+                    )
+                    .withValue(
+                        ContactsContract.Contacts.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE
+                    )
+                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, it)
+                    .withValue(
+                        ContactsContract.Contacts.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE
+                    )
+                    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, "1").build()
+            )
+        }
+
         //Display name/Contact name
         ops.add(
             ContentProviderOperation
@@ -146,6 +214,52 @@ class ManageContactActivity : AppCompatActivity() {
         } catch (e: OperationApplicationException) {
             // TODO Auto-generated catch block
             e.printStackTrace()
+        } catch (e: Exception) {
+            // TODO Auto-generated catch block
+            e.printStackTrace()
+        }
+    }
+
+    private fun splitFullName(fullName: List<String>) {
+        when (fullName.size) {
+            1 -> {
+                firstName.setText(fullName[0])
+            }
+            2 -> {
+                firstName.setText(fullName[0])
+                secondName.setText(fullName[1])
+            }
+        }
+        if (fullName.size > 2) {
+            firstName.setText(fullName[0])
+            var secondName: String = ""
+            fullName.forEach {
+                if (it == fullName[0]) {
+                    return@forEach
+                }
+                secondName += " $it"
+            }
+            this.secondName.setText(secondName)
+        }
+    }
+
+    private fun showNumbers(numbers: MutableList<String>) {
+        when (numbers.size) {
+            1 -> {
+                firstNumber.setText(numbers[0])
+            }
+            2 -> {
+                firstNumber.setText(numbers[0])
+                secondNumber.setText(numbers[1])
+                linearLayout_2.visibility = View.VISIBLE
+            }
+        }
+        if (numbers.size > 2) {
+            firstNumber.setText(numbers[0])
+            secondNumber.setText(numbers[1])
+            thirdNumber.setText(numbers[2])
+            linearLayout_2.visibility = View.VISIBLE
+            linearLayout_3.visibility = View.VISIBLE
         }
     }
 }

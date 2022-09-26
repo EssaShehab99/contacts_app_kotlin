@@ -9,15 +9,30 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-                <EditText
-                    android:id="@+id/search_value"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:drawableStart="@android:drawable/ic_menu_search"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:inputType="text"/>
+
+        <LinearLayout
+            android:id="@+id/layout_1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <EditText
+                android:id="@+id/search_value"
+                android:layout_width="fill_parent"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:drawableStart="@android:drawable/ic_menu_search"
+                android:inputType="text"
+                android:layout_marginHorizontal="10dp"/>
+            <ImageView
+                android:id="@+id/button"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:padding="15dp"
+                android:src="@drawable/ic_baseline_filter_list_24"/>
+        </LinearLayout>
         <ListView
             android:id="@+id/contact_list_view"
             android:layout_width="match_parent"
@@ -25,7 +40,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_value" />
+        app:layout_constraintTop_toBottomOf="@+id/layout_1" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/edit_btn"

@@ -7,6 +7,8 @@ import android.content.OperationApplicationException
 import android.os.Bundle
 import android.os.RemoteException
 import android.provider.ContactsContract
+import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,12 +17,23 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 class ContactDetailsActivity : AppCompatActivity() {
     private var id: Long = 0
     lateinit var fullName: TextView
-    lateinit var phoneNumber: TextView
+    lateinit var firstNumber: TextView
+    lateinit var secondNumber: TextView
+    lateinit var thirdNumber: TextView
+    private lateinit var linearLayout_2: LinearLayout
+    private lateinit var linearLayout_3: LinearLayout
+
+    private val numbers: MutableList<String> = mutableListOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contact_details)
         fullName = findViewById(R.id.fullName)
-        phoneNumber = findViewById(R.id.phone_number_text_view)
+        firstNumber = findViewById(R.id.first_number_text_view)
+        secondNumber = findViewById(R.id.second_number_text_view)
+        thirdNumber = findViewById(R.id.third_number_text_view)
+        linearLayout_2=findViewById(R.id.layout_2)
+        linearLayout_3=findViewById(R.id.layout_3)
         id = intent.getLongExtra("id", 0)
         val editBTN: FloatingActionButton = findViewById(R.id.edit_btn)
         val deleteBTN: FloatingActionButton = findViewById(R.id.delete_btn)
@@ -28,7 +41,7 @@ class ContactDetailsActivity : AppCompatActivity() {
             val intent = Intent(this, ManageContactActivity::class.java).apply {
                 putExtra("id", id)
                 putExtra("fullName", fullName.text)
-                putExtra("phoneNumber", phoneNumber.text)
+                putExtra("numbers", numbers.toTypedArray())
             }
             startActivity(intent)
 
@@ -40,7 +53,9 @@ class ContactDetailsActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        numbers.clear()
         getContactDetails()
+        showNumbers(numbers)
     }
 
     @SuppressLint("Range")
@@ -59,17 +74,17 @@ class ContactDetailsActivity : AppCompatActivity() {
                         ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
                     )
                 )
-                phoneNumber.text = phonesCursor.getString(
+                numbers.add(phonesCursor.getString(
                     phonesCursor.getColumnIndex(
                         ContactsContract.CommonDataKinds.Phone.NUMBER
                     )
-                ).replace("-", "").replace(" ", "")
+                ).replace("-", "").replace(" ", ""))
 
             }
         }
     }
 
-    private fun  deletePhone(){
+    private fun deletePhone() {
         val ops = ArrayList<ContentProviderOperation>()
         ops.add(
             ContentProviderOperation
@@ -94,5 +109,25 @@ class ContactDetailsActivity : AppCompatActivity() {
             e.printStackTrace()
         }
 
+    }
+
+    private fun showNumbers(numbers: MutableList<String>){
+        when (numbers.size){
+            1->{
+                firstNumber.setText(numbers[0])
+            }
+            2->{
+                firstNumber.setText(numbers[0])
+                secondNumber.setText(numbers[1])
+                linearLayout_2.visibility= View.VISIBLE
+            }
+        }
+        if(numbers.size>2){
+            firstNumber.setText(numbers[0])
+            secondNumber.setText(numbers[1])
+            thirdNumber.setText(numbers[2])
+            linearLayout_2.visibility= View.VISIBLE
+            linearLayout_3.visibility= View.VISIBLE
+        }
     }
 }
