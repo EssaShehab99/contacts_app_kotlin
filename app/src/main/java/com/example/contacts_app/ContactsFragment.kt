@@ -27,6 +27,7 @@ class ContactsFragment : Fragment(),
     private var cursorAdapter: SimpleCursorAdapter? = null
     var contacts: MutableList<ContactModel> = mutableListOf()
     var contactsName: MutableList<String> = mutableListOf()
+    lateinit var searchValue: EditText
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -49,7 +50,7 @@ class ContactsFragment : Fragment(),
     @Deprecated("Deprecated in Java")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val searchValue: EditText = requireActivity().findViewById(R.id.search_value)
+         searchValue = requireActivity().findViewById(R.id.search_value)
         searchValue.doOnTextChanged { text, _, _, _ ->
             searchString = text.toString()
             if (text.isNullOrEmpty() || text.isNullOrBlank()) {
@@ -74,7 +75,7 @@ class ContactsFragment : Fragment(),
                 var json: JSONObject=getSearchContacts()?.let { JSONObject(it) }?: JSONObject()
                 json.keys().forEach {keyStr ->
                     run {
-                        if (json.get(keyStr).toString().toInt() > 3) {
+                        if (json.get(keyStr).toString().toInt() > 0) {
                             setContactsToListView(keyStr.toString(), false)
                         }
                     }
@@ -88,6 +89,7 @@ class ContactsFragment : Fragment(),
 
     override fun onStart() {
         super.onStart()
+        searchValue.text.clear()
         getContactList()
         setContactsToListView()
     }
