@@ -100,18 +100,15 @@ class ManageContactActivity : AppCompatActivity() {
                                 firstName.text.toString() + " " + secondName.text.toString()
                             )
                         } else {
-                            var np = numbers
                             oldNumbers.forEach {
                                 numbers.add(it)
                             }
-                            var na = numbers
                             deletePhone(contactId)
                             insertPhone(
                                 numbers,
                                 firstName.text.toString() + " " + secondName.text.toString()
                             )
                         }
-
                     }
                 } else {
                     Toast.makeText(this, "Please insert phone number", Toast.LENGTH_SHORT).show()
